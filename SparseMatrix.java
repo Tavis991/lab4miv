@@ -99,19 +99,16 @@ public class  SparseMatrix implements Matrix  {
     SparseMatrix add (SparseMatrix other) throws Exception {
         if (this.size != other.size) throw new Exception("dimensional error");
         SparseMatrix fresh = SparseMatrix();
-        boolean found = false;
         int i, j, k, l;
         Linky.gotoBeginning()
         do {
             i = Linky.getCursor().getI();     j = Linky.getCursor().getJ();
-            if (trans) {  int temp = i; i = j; j = temp; }
             fresh.put( i, j, (get(i, j) + other.get(i, j));
             }
             while (Linky.gotoNext());
         other.Linky.gotoBeginning()
         do {
             i = other.Linky.getCursor().getI();     j = other.Linky.getCursor().getJ();
-            if (other.trans) {  int temp = i; i = j; j = temp; }
             fresh.put( i, j, (other.get(i, j) + get(i, j));
             }
             while (other.Linky.gotoNext());
@@ -122,7 +119,9 @@ public class  SparseMatrix implements Matrix  {
                       
       SparseMatrix sub (SparseMatrix other) throws Exception {
           other.scal *= -1;
-          return add(other);
+          SparseMatrix temp= add(other);
+          other.scal *= -1;
+          return temp;
       }
             
             
