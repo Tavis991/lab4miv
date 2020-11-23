@@ -26,18 +26,27 @@ public class  SparseMatrix implements Matrix  {
 
     @Override
     public double get(int i, int j) {
+        SparseMatrixEntry temp = Linky.getCursor();
         if(trans){ int temp=i; i=j; j=temp;}
         if ((i > size-1) || (i < 0)  || (j > size - 1) || (j < 0)){ //checking bounds
             System.err.println("out of bounds" ); return 0;
         }
         if (Linky.gotoBeginning()) {  //iterating Linked list
             do {
-                if (Linky.getCursor().getI() == i && Linky.getCursor().getJ() == j)
+                if (Linky.getCursor().getI() == i && Linky.getCursor().getJ() == j) {     
+                    Linky.gotoBeginning();
+                    do{
+                       if(Linky.getCursor == temp){ return def_val*scal; }
+                    while(Linky.gotoNext) 
                     return Linky.getCursor().getValue() * scal;
+                }
             }
             while (Linky.gotoNext());
         }
-        return def_val*scal;
+        Linky.gotoBeginning();
+        do{
+            if(Linky.getCursor == temp){ return def_val*scal; }
+        while(Linky.gotoNext)
     }
 
     @Override
