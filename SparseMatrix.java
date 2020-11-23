@@ -9,10 +9,10 @@ public class  SparseMatrix implements Matrix  {
     private boolean trans;
     private int scal;
 
-    public SparseMatrix(SparseMatrix other){
-        SparseMatrix fresh = new SparseMatrix(other.size, other.def_val);
-        Linky = new SLinkedList<>(other.Linky);
-    }
+//     public SparseMatrix(SparseMatrix other){
+//         SparseMatrix fresh = new SparseMatrix(other.size, other.def_val);
+//         Linky = new SLinkedList<>(other.Linky);
+//     }
     public SparseMatrix(int size, double def_val){
         scal=1;
         Linky = new SLinkedList<SparseMatrixEntry>();
@@ -47,7 +47,7 @@ public class  SparseMatrix implements Matrix  {
         if(!Linky.isEmpty()) {   //so not to increase LL size with every put, we check and replace instead of just appending
             do {
                 if (Linky.getCursor().getI() == i && Linky.getCursor().getJ() == j) {
-                    if (x == def_val) Linky.remove();  // if value is just def value we simply delete entry
+                    if (x == def_val) Linky.remove(); return;  // if value is just def value we simply delete entry
                     else { Linky.replace(new SparseMatrixEntry(x, i, j));return;  } //inserting new node
                 }
             }
@@ -65,29 +65,6 @@ public class  SparseMatrix implements Matrix  {
         Linky.insert (new SparseMatrixEntry(x/scal, i ,j));
     }
 
-    public void put(int i, int j, double x, boolean flag) {
-        if (trans) { int temp=i; i=j; j=temp;} //trans effect
-        if ( x == get(i,j)) { return;}  // get already checking bounds
-        if(!Linky.isEmpty()) {   //so not to increase LL size with every put, we check and replace instead of just appending
-            do {
-                if (Linky.getCursor().getI() == i && Linky.getCursor().getJ() == j) {
-                    if (x == def_val) Linky.remove();  // if value is just def value we simply delete entry
-                    else { Linky.replace(new SparseMatrixEntry(x, i, j));return;  } //inserting new node
-                }
-            }
-            while (Linky.gotoNext());
-        }
-
-
-        Linky.gotoBeginning();
-        if (Linky.isEmpty()) { Linky.insert (new SparseMatrixEntry(x/scal, i ,j)); return;}
-        do   {if (Linky.getCursor().getI() == i && Linky.getCursor().getJ() == j)
-        { Linky.getCursor().setValue(x/scal);  return; }
-        }
-        while (Linky.gotoNext()) ;
-
-        Linky.insert (new SparseMatrixEntry(x/scal, i ,j));
-    }
     @Override
     public void transpose() {
         trans=!trans;  //trans flag
@@ -118,13 +95,38 @@ public class  SparseMatrix implements Matrix  {
         return bild.toString();
     }
 
+   
     SparseMatrix add (SparseMatrix other) throws Exception {
         if (this.size != other.size) throw new Exception("dimensional error");
-        SparseMatrix fresh = new SparseMatrix(other);
-        fresh.trans = other.trans;
+        SparseMatrix fresh = SparseMatrix();
         boolean found = false;
         int i, j, k, l;
-
+        Linky.gotoBeginning()
+        do {
+            i = Linky.getCursor().getI();     j = Linky.getCursor().getJ();
+            if (trans) {  int temp = i; i = j; j = temp; }
+            fresh.put( i, j, (get(i, j) + other.get(i, j));
+            }
+            while (Linky.gotoNext());
+        other.Linky.gotoBeginning()
+        do {
+            i = other.Linky.getCursor().getI();     j = other.Linky.getCursor().getJ();
+            if (other.trans) {  int temp = i; i = j; j = temp; }
+            fresh.put( i, j, (other.get(i, j) + get(i, j));
+            }
+            while (other.Linky.gotoNext());
+         fresh.def_val += def_val;   fresh.scal *= scal;
+         return fresh;
+      }
+                  
+                      
+      SparseMatrix sub (SparseMatrix other) throws Exception {
+          other.scal *= -1;
+          return add(other);
+      }
+            
+            
+            
 //        if (!Linky.isEmpty()) {   //so not to increase LL size with every put, we check and replace instead of just appending
 //            do {
 //                i = fresh.Linky.getCursor().getI();     j = fresh.Linky.getCursor().getJ();
@@ -132,31 +134,30 @@ public class  SparseMatrix implements Matrix  {
 //
 //                fresh.put( i, j, (temp + Linky.getCursor().getValue()), true);
 //            }
-//            while (Linky.gotoNext());
+//             }
+//        do {
+//            if (!Linky.isEmpty() && (!fresh.Linky.isEmpty())) {   //so not to increase LL size with every put, we check and replace instead of just appending
+//                do {
+//                    i = fresh.Linky.getCursor().getI();
+//                    j = fresh.Linky.getCursor().getJ();
+//                    if (trans) { int temp = i;   i = j;  j = temp; }
+//                    if (other.trans) { int temp = i; i = j;  j = temp; }
+//                    if (Linky.getCursor().getI() == i && Linky.getCursor().getJ() == j) {
+//                        double temp = fresh.Linky.getCursor().getValue();
+//                        fresh.Linky.getCursor().setValue(temp + Linky.getCursor().getValue());
+//                        found = true;
+//                        break;
+//                    }
+//                }
+//                while (Linky.gotoNext());
+//            }
+//            if (!found) {
+//                fresh.Linky.getCursor().setValue(fresh.Linky.getCursor().getValue() + def_val);
+//            }
 //        }
-       do {
-           if (!Linky.isEmpty() && (!fresh.Linky.isEmpty())) {   //so not to increase LL size with every put, we check and replace instead of just appending
-               do {
-                   i = fresh.Linky.getCursor().getI();
-                   j = fresh.Linky.getCursor().getJ();
-                   if (trans) { int temp = i;   i = j;  j = temp; }
-                   if (other.trans) { int temp = i; i = j;  j = temp; }
-                   if (Linky.getCursor().getI() == i && Linky.getCursor().getJ() == j) {
-                       double temp = fresh.Linky.getCursor().getValue();
-                       fresh.Linky.getCursor().setValue(temp + Linky.getCursor().getValue());
-                       found = true;
-                       break;
-                   }
-               }
-               while (Linky.gotoNext());
-           }
-           if (!found) {
-               fresh.Linky.getCursor().setValue(fresh.Linky.getCursor().getValue() + def_val);
-           }
-       }
-        while(fresh.Linky.gotoNext());
-        fresh.def_val += def_val;   fresh.scal *= scal;
-        return fresh;
-        }
+//         while(fresh.Linky.gotoNext());
+//         fresh.def_val += def_val;   fresh.scal *= scal;
+//         return fresh;
+//         }
 
 }
